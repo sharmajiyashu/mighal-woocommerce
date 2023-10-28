@@ -28,7 +28,6 @@ class Controller extends BaseController
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $token,
         ])->get("$woocommerceUrl/wp-json/wp/v2/users/me");
-
         if ($response->successful()) {
             $user = $response->json();
             return $this->sendSuccess('Customer data fetch successfully',$user);
@@ -45,14 +44,23 @@ class Controller extends BaseController
         $consumerKey = env('consumer_key');
         $consumerSecret = env('consumer_secret');
         $credentials = base64_encode("$consumerKey:$consumerSecret");
-
         $response = Http::withHeaders([
             // 'Authorization' => 'Basic ' . $credentials,
         ])->post("$woocommerceUrl/wp-json/jwt-auth/v1/token",$request->validated());
-        // return $response;
         if ($response->successful()) {
             $tokenData = $response->json();
-            return $this->sendSuccess('Customer login successfully',$tokenData);
+            $token = $tokenData['token'];
+            $get_user_detail_res = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $token,
+            ])->get("$woocommerceUrl/wp-json/wp/v2/users/me");
+            if ($get_user_detail_res->successful()) {
+                $user = $get_user_detail_res->json();
+                $tokenData['customer_id'] = $user['id'];
+                return $this->sendSuccess('Customer data fetch successfully',$tokenData);
+            } else {
+                $data = $get_user_detail_res->json();
+                return $this->sendFailed($data['message'],);
+            }
         } else {
             return $this->sendFailed('Login failed',);
         }
@@ -80,44 +88,20 @@ class Controller extends BaseController
         }
     }
 
-    public function cartCheckout(Request $request)
-    {
-        $woocommerceUrl = env('woocommerce_url');
-        // Replace with the token you obtained during login
-        $token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2hpZ2hmbHlyZWFsZXN0YXRlLmNvbS9uZXciLCJpYXQiOjE2OTgyMDU2NTgsIm5iZiI6MTY5ODIwNTY1OCwiZXhwIjoxNjk4ODEwNDU4LCJkYXRhIjp7InVzZXIiOnsiaWQiOiI0In19fQ.5r6MQe4zGJZXgSHzzJ_uMpJ6sE722MwAN8BPeDaNc_s';
-
-        // Make a GET request to the WooCommerce API with the token in the headers
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->get("$woocommerceUrl/wp-json/wc/v3/orders",);
-
-        if ($response->successful()) {
-            $user = $response->json();
-            dd($user);
-        } else {
-            // Handle errors here
-            dd($response->status(), $response->json());
-        }
-        
-    }
-
     public function getCategories()
     {
         $woocommerceUrl = env('woocommerce_url');
         $consumerKey = env('consumer_key');
         $consumerSecret = env('consumer_secret');
         $credentials = base64_encode("$consumerKey:$consumerSecret");
-
         $response = Http::withHeaders([
             'Authorization' => 'Basic ' . $credentials,
             ])->get("$woocommerceUrl/wp-json/wc/v3/products/categories", [
                 'per_page' => 100,
                 'page' => 1,
             ]);
-        
         if ($response->successful()) {
             $tokenData = $response->json();
-            // print_r($tokenData);die;
             $data = CategoriesResource::collection($tokenData);
             return $this->sendSuccess('category fetch successfully',$data);
         } else {
@@ -131,7 +115,6 @@ class Controller extends BaseController
         $consumerKey = env('consumer_key');
         $consumerSecret = env('consumer_secret');
         $credentials = base64_encode("$consumerKey:$consumerSecret");
-
         $response = Http::withHeaders([
             'Authorization' => 'Basic ' . $credentials,
         ])->get("$woocommerceUrl/wp-json/wc/v3/products",[
@@ -149,13 +132,11 @@ class Controller extends BaseController
 
 
     public function getCategoryProducts(Request $request){
-
         $category_id = $request->category_id;
         $woocommerceUrl = env('woocommerce_url');
         $consumerKey = env('consumer_key');
         $consumerSecret = env('consumer_secret');
         $credentials = base64_encode("$consumerKey:$consumerSecret");
-
         $response = Http::withHeaders([
             'Authorization' => 'Basic ' . $credentials,
         ])->get("$woocommerceUrl/wp-json/wc/v3/products?category=$category_id",[
@@ -177,7 +158,6 @@ class Controller extends BaseController
         $consumerKey = env('consumer_key');
         $consumerSecret = env('consumer_secret');
         $credentials = base64_encode("$consumerKey:$consumerSecret");
-
         $response = Http::withHeaders([
             'Authorization' => 'Basic ' . $credentials,
         ])->get("$woocommerceUrl/wp-json/wc/v3/products/$product_id");
@@ -232,10 +212,6 @@ class Controller extends BaseController
             return $this->sendFailed('Login failed',);
         }
     }
-
-
-
-
 }
 
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AddProductInCartRequest;
+use App\Http\Requests\ApiCustomerIDRequest;
 use App\Http\Requests\ApiTokenRequest;
 use App\Http\Resources\CartResource;
 use Illuminate\Http\Request;
@@ -89,6 +90,40 @@ class CartController extends Controller
             return $this->sendFailed($data['message'],);
         }
 
+    }
+
+    function updateShippingAddress(ApiCustomerIDRequest $request){
+        $woocommerceUrl = env('woocommerce_url');
+        $consumerKey = env('consumer_key');
+        $consumerSecret = env('consumer_secret');
+        $credentials = base64_encode("$consumerKey:$consumerSecret");
+        $customer_id = $request->customer_id;
+        $data = [
+            'first_name' => isset($request->first_name) ? $request->first_name :'',
+            'company' => isset($request->company) ? $request->company :'',
+            'last_name' => isset($request->last_name) ? $request->last_name :'',
+            'address_1' => isset($request->address_1) ? $request->address_1 :'',
+            'address_2' => isset($request->address_2) ? $request->address_2 :'',
+            'city' => isset($request->city) ? $request->city :'',
+            'state' => isset($request->state) ? $request->state :'',
+            'postcode' => isset($request->postcode) ? $request->postcode :'',
+            'country' => isset($request->country) ? $request->country :'',
+            'email' => isset($request->email) ? $request->email :'',
+            'phone' => isset($request->phone) ? $request->phone :'',
+        ];
+        $updated_billing_address = [
+            'billing' => $data,
+            'shipping' => $data
+        ];
+        $response = Http::withHeaders([
+            'Authorization' => 'Basic ' . $credentials,
+        ])->put("$woocommerceUrl/wp-json/wc/v3/customers/$customer_id", $updated_billing_address);
+        if ($response->successful()) {
+            return $this->sendSuccess('Billing address update successfully',$response->json());
+        } else {
+            $data = $response->json();
+            return $this->sendFailed($data['message'],);
+        }
     }
 
 
