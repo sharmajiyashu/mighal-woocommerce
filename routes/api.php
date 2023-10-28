@@ -21,7 +21,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('get_user_cart',[Controller::class,'getUserCartDetails']);
+
 Route::post('register_user',[Controller::class,'registerUser']);
 Route::post('login',[Controller::class,'loginUser']);
 Route::get('user_detail',[Controller::class,'getUserDetails']);
@@ -31,11 +31,15 @@ Route::get('products',[Controller::class,'getProducts']);
 Route::get('category_products',[Controller::class,'getCategoryProducts']);
 Route::get('product_detail',[Controller::class,'productDetail']);
 
-Route::get('home_details',[Controller::class,'getHomeSchreen']);
+Route::get('home_details_1',[Controller::class,'getHomeSchreen_1']);
+Route::get('home_details_2',[Controller::class,'getHomeSchreen_2']);
+Route::get('home_details_3',[Controller::class,'getHomeSchreen_3']);
 
 
 // Route::get('create_order',[OrderController::class,'createOrder']);
 Route::get('orders',[OrderController::class,'getOrders']);
 Route::get('order_detail',[OrderController::class,'getOrderDetail']);
-Route::get('add_product_in_Cart',[CartController::class,'addInCart']);
 Route::get('create_order',[OrderController::class,'create_order']);
+
+Route::post('add_to_cart',[CartController::class,'addInCart']);
+Route::get('get_user_cart',[CartController::class,'getUserCartDetails']);

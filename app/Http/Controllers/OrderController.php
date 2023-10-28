@@ -7,6 +7,8 @@ use App\Http\Resources\OrdersResource;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
+
 
 class OrderController extends Controller
 {
@@ -126,50 +128,6 @@ class OrderController extends Controller
         }
     }
 
-    // public function create_order(){
-    //     $woocommerceUrl = env('woocommerce_url');
-    //     $token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2hpZ2hmbHlyZWFsZXN0YXRlLmNvbS9uZXciLCJpYXQiOjE2OTgyNDM1MDAsIm5iZiI6MTY5ODI0MzUwMCwiZXhwIjoxNjk4ODQ4MzAwLCJkYXRhIjp7InVzZXIiOnsiaWQiOiI3In19fQ.8CtC2Eke3o0KZk8XSm0F1tTfNcfK9s2-CuYOx7fNOog";
-    //     $response = Http::withHeaders([
-    //         // 'Authorization' => 'Bearer ' . $request->token, // Replace with your JWT token
-    //         'Authorization' => 'Bearer ' . $token, // Replace with your JWT token
-    //     ])->get("$woocommerceUrl/wp-json/wc/store/cart/");        
-    //     if ($response->successful()) {
-    //         $cartDetails = $response->json();
-    //         // return $cartDetails;
-    //         // print_r($cartDetails['items']);die;
-
-    //         $order_data = [
-    //             'customer_id' => 7,
-    //             // 'line_items' => $cartDetails['items'],
-    //             'line_items' => [
-    //                             [
-    //                                 'product_id' => 25,
-    //                                 'quantity' => 1,
-    //                             ],
-    //                             // [
-    //                             //     'product_id' => 14,
-    //                             //     'quantity' => 5,
-    //                             // ],
-    //                         ],
-    //         ];
-
-    //         // print_r($order_data);die;
-    //         $consumerKey = env('consumer_key');
-    //         $consumerSecret = env('consumer_secret');
-    //         $credentials = base64_encode("$consumerKey:$consumerSecret");
-    //         $response = Http::withHeaders([
-    //                     // 'Authorization' => 'Bearer ' . $token,
-    //                     'Authorization' => 'Basic ' . $credentials,
-    //                 ])->post("$woocommerceUrl/wp-json/wc/v3/orders",$order_data);
-
-    //         return $response;
-    //         // print_r($response);die;
-    //         return $this->sendSuccess('cart fetch successfully',$cartDetails);
-    //     } else {
-    //         $data = $response->json();
-    //         return $this->sendFailed($data['message'],);
-    //     }
-    // }
 
 
 }
