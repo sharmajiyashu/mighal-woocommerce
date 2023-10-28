@@ -39,9 +39,9 @@ class CartController extends Controller
         $token = $request->token;
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $token, // Replace with your JWT token
-        ])->get("$woocommerceUrl/wp-json/wc/store/cart/");        
-        $nonce = $response->header('X-WC-Store-API-Nonce');
+        ])->get("$woocommerceUrl/wp-json/wc/store/cart/");     
         if ($response->successful()) {
+            $nonce = $response->header('X-WC-Store-API-Nonce');
             $cartDetails = $response->json();
             $add_to_cart_response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
@@ -57,6 +57,34 @@ class CartController extends Controller
             $data = $response->json();
             return $this->sendFailed($data['message'],);
         }
+    }
+
+
+    function removeCartItem(Request $request){
+        $woocommerceUrl = env('woocommerce_url');
+        $token = $request->token;
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $token, // Replace with your JWT token
+        ])->get("$woocommerceUrl/wp-json/wc/store/cart/");     
+        if ($response->successful()) {   
+            $nonce = $response->header('X-WC-Store-API-Nonce');
+            $delet_cart_response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $request->token,
+                'Nonce' =>$nonce,
+            ])->post("$woocommerceUrl/wp-json/wc/store/cart/remove-item", [
+                'key' => $request->key,
+            ]);
+            if ($delet_cart_response->successful()) {  
+                return $this->sendSuccess('Product added successfully in cart',$delet_cart_response->json());
+            } else {
+                $data = $delet_cart_response->json();
+                return $this->sendFailed($data['message'],);
+            }
+        } else {
+            $data = $response->json();
+            return $this->sendFailed($data['message'],);
+        }
+
     }
 
 
