@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AddProductInCartRequest;
 use App\Http\Requests\ApiTokenRequest;
+use App\Http\Resources\CartResource;
 use Illuminate\Http\Request;
 use App\Traits\ApiResponse;
 use Illuminate\Support\Facades\Http;
@@ -19,7 +20,8 @@ class CartController extends Controller
         ])->get("$woocommerceUrl/wp-json/wc/store/cart/");        
         if ($response->successful()) {
             $cartDetails = $response->json();
-            return $this->sendSuccess('cart fetch successfully',$cartDetails);
+            $data = new CartResource($cartDetails);
+            return $this->sendSuccess('cart fetch successfully',$data);
         } else {
             $data = $response->json();
             return $this->sendFailed($data['message'],);
@@ -48,7 +50,8 @@ class CartController extends Controller
                 'Nonce' =>$nonce,
             ])->post("$woocommerceUrl/wp-json/wc/store/cart/add-item",$product_data);
             if ($add_to_cart_response->successful()) {
-                return $this->sendSuccess('Product added successfully in cart',$add_to_cart_response->json());
+                $data = new CartResource($add_to_cart_response->json());
+                return $this->sendSuccess('Product added successfully in cart',$data);
             } else {
                 $data = $add_to_cart_response->json();
                 return $this->sendFailed($data['message'],);
@@ -75,7 +78,8 @@ class CartController extends Controller
                 'key' => $request->key,
             ]);
             if ($delet_cart_response->successful()) {  
-                return $this->sendSuccess('Product added successfully in cart',$delet_cart_response->json());
+                $data = new CartResource($delet_cart_response->json());
+                return $this->sendSuccess('Product Remove from cart',$data);
             } else {
                 $data = $delet_cart_response->json();
                 return $this->sendFailed($data['message'],);

@@ -41,7 +41,7 @@ Route::get('home_details_3',[Controller::class,'getHomeSchreen_3']);
 // Route::get('create_order',[OrderController::class,'createOrder']);
 Route::get('orders',[OrderController::class,'getOrders']);
 Route::get('order_detail',[OrderController::class,'getOrderDetail']);
-Route::get('create_order',[OrderController::class,'create_order']);
+Route::get('create_order',[OrderController::class,'createOrder']);
 
 Route::post('add_to_cart',[CartController::class,'addInCart']);
 Route::get('get_user_cart',[CartController::class,'getUserCartDetails']);
