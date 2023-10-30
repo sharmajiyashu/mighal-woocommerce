@@ -126,7 +126,49 @@ class CartController extends Controller
         }
     }
 
-
-
+    function addMultipleProduct(Request $request){
+        $woocommerceUrl = env('woocommerce_url');
+        $consumerKey = env('consumer_key');
+        $consumerSecret = env('consumer_secret');
+        $credentials = base64_encode("$consumerKey:$consumerSecret");
+        $token = $request->token;
+        $data = $request->all();
+        $success_added = 0;
+        $error_msg = [];
+        foreach($data as $key=>$val){
+            if(!empty($val['product_id']) && !empty($val['quantity'])){
+                $product_data = [
+                    'id' => isset($val['product_id']) ? $val['product_id'] :'',
+                    'quantity' => isset($val['quantity']) ? $val['quantity'] :'',
+                    'variation_id' => isset($val['variation_id']) ? $val['variation_id'] :'',
+                ];
+                $response = Http::withHeaders([
+                    'Authorization' => 'Bearer ' . $token, // Replace with your JWT token
+                ])->get("$woocommerceUrl/wp-json/wc/store/cart/");     
+                if ($response->successful()) {
+                    $nonce = $response->header('X-WC-Store-API-Nonce');
+                    $cartDetails = $response->json();
+                    $add_to_cart_response = Http::withHeaders([
+                        'Authorization' => 'Bearer ' . $token,
+                        'Nonce' =>$nonce,
+                    ])->post("$woocommerceUrl/wp-json/wc/store/cart/add-item",$product_data);
+                    if ($add_to_cart_response->successful()) {
+                        $data = new CartResource($add_to_cart_response->json());
+                        $success_added ++;
+                    } else {
+                        $data = $add_to_cart_response->json();
+                        $error_msg[] = $data['message'];
+                    }
+                } else {
+                    $data = $response->json();
+                    $error_msg[] = $data['message'];
+                }
+            }
+        }
+        return $this->sendSuccess($success_added.' product added in cart',[
+            'total_added' => $success_added,
+            'error' => $error_msg
+        ]);
+    }
 
 }

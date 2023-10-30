@@ -39,6 +39,7 @@ Route::get('order_detail',[OrderController::class,'getOrderDetail']);
 Route::post('create_order',[OrderController::class,'createOrder']);
 
 Route::post('add_to_cart',[CartController::class,'addInCart']);
+Route::post('add_to_cart_all',[CartController::class,'addMultipleProduct']);
 Route::get('get_user_cart',[CartController::class,'getUserCartDetails']);
 Route::post('remove_cart_item',[CartController::class,'removeCartItem']);
 

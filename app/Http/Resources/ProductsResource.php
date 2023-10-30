@@ -39,6 +39,7 @@ class ProductsResource extends JsonResource
             'stock_status' => $this['stock_status'],
             'category_name' => isset($this['categories'][0]['name']) ? $this['categories'][0]['name'] :'',
             'category_id' => isset($this['categories'][0]['id']) ? $this['categories'][0]['id'] :'',
+            'stock_quantity' => $this['stock_quantity']
         ];
     }
 }

@@ -161,6 +161,7 @@ class Controller extends BaseController
         $response = Http::withHeaders([
             'Authorization' => 'Basic ' . $credentials,
         ])->get("$woocommerceUrl/wp-json/wc/v3/products/$product_id");
+        // return $response;
         if ($response->successful()) {
             $tokenData = $response->json();
             $data = new ProductsResource($tokenData);
@@ -170,48 +171,85 @@ class Controller extends BaseController
         }
     }
 
-
     function getHomeSchreen_1(){
-        $category_data = self::get_category_product(473);
+        $category_data = [
+            'id' => 473,
+            'name' => "Mix n Match",
+            'image' => ['src' => 'https://mighzalalarab.com/wp-content/uploads/2023/09/O1CN01F5Qaff1uoWWLraCNT_2212706806084-0-cib.jpg'],
+        ];
+
+        $category_data = self::get_category_product($category_data);
         return $this->sendSuccess('Home 1 fetch successfully',$category_data);
     }
 
     function getHomeSchreen_2(){
-        $category_data = self::get_category_product(607);
+        $category_data = [
+            'id' => 607,
+            'name' => "DESIGNER PICKS",
+            'image' => ['src' => 'https://mighzalalarab.com/wp-content/uploads/2023/09/O1CN01W8Lfeq1uoWSQ1yGHN_2212706806084-0-cib.jpg'],
+        ];
+        $category_data = self::get_category_product($category_data);
         return $this->sendSuccess('Home 2 fetch successfully',$category_data);
     }
 
     function getHomeSchreen_3(){
-        $category_data = self::get_category_product(443);
+        $category_data = [
+            'id' => 443,
+            'name' => "All Bracelet",
+            'image' => ['src' => 'https://mighzalalarab.com/wp-content/uploads/2023/08/DSC_0579.jpg'],
+        ];
+        $category_data = self::get_category_product($category_data);
         return $this->sendSuccess('Home 3 fetch successfully',$category_data);
     }
 
-    function get_category_product($category_id){
+    function get_category_product($category_data){
         $woocommerceUrl = env('woocommerce_url');
         $consumerKey = env('consumer_key');
         $consumerSecret = env('consumer_secret');
         $credentials = base64_encode("$consumerKey:$consumerSecret");
-        $response = Http::withHeaders([
+        // $category_data = $response->json();
+        $category_id = $category_data['id'];
+        $products_data = Http::withHeaders([
             'Authorization' => 'Basic ' . $credentials,
-        ])->get("$woocommerceUrl/wp-json/wc/v3/products/categories/$category_id");
-        if ($response->successful()) {
-            $category_data = $response->json();
-            $products_data = Http::withHeaders([
-                'Authorization' => 'Basic ' . $credentials,
-            ])->get("$woocommerceUrl/wp-json/wc/v3/products?category=$category_id&per_page=8");
-            if ($products_data->successful()) {
-                $tokenData = $products_data->json();
-                $product_data = ProductsResource::collection($tokenData);
-            } else {
-                $product_data = [];
-            }
-            $category_data['product_data'] = $product_data;
-            $category_data =  new CategoriesResource($category_data);
-            return $category_data;
+        ])->get("$woocommerceUrl/wp-json/wc/v3/products?category=$category_id&per_page=8");
+        if ($products_data->successful()) {
+            $tokenData = $products_data->json();
+            $product_data = ProductsResource::collection($tokenData);
         } else {
-            return $this->sendFailed('Login failed',);
+            $product_data = [];
         }
+        $category_data['product_data'] = $product_data;
+        $category_data =  new CategoriesResource($category_data);
+        return $category_data;
+        
     }
+
+    // function get_category_product($category_id){
+    //     $woocommerceUrl = env('woocommerce_url');
+    //     $consumerKey = env('consumer_key');
+    //     $consumerSecret = env('consumer_secret');
+    //     $credentials = base64_encode("$consumerKey:$consumerSecret");
+    //     $response = Http::withHeaders([
+    //         'Authorization' => 'Basic ' . $credentials,
+    //     ])->get("$woocommerceUrl/wp-json/wc/v3/products/categories/$category_id");
+    //     if ($response->successful()) {
+    //         $category_data = $response->json();
+    //         $products_data = Http::withHeaders([
+    //             'Authorization' => 'Basic ' . $credentials,
+    //         ])->get("$woocommerceUrl/wp-json/wc/v3/products?category=$category_id&per_page=8");
+    //         if ($products_data->successful()) {
+    //             $tokenData = $products_data->json();
+    //             $product_data = ProductsResource::collection($tokenData);
+    //         } else {
+    //             $product_data = [];
+    //         }
+    //         $category_data['product_data'] = $product_data;
+    //         $category_data =  new CategoriesResource($category_data);
+    //         return $category_data;
+    //     } else {
+    //         return $this->sendFailed('Login failed',);
+    //     }
+    // }
 }
 
 
