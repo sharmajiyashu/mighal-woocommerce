@@ -25,7 +25,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('register_user',[Controller::class,'registerUser']);
 Route::post('login',[Controller::class,'loginUser']);
 Route::get('user_detail',[Controller::class,'getUserDetails']);
-Route::get('cart_checkout',[Controller::class,'cartCheckout']);
 Route::get('categories',[Controller::class,'getCategories']);
 Route::get('products',[Controller::class,'getProducts']);
 Route::get('category_products',[Controller::class,'getCategoryProducts']);
@@ -35,7 +34,6 @@ Route::get('home_details_1',[Controller::class,'getHomeSchreen_1']);
 Route::get('home_details_2',[Controller::class,'getHomeSchreen_2']);
 Route::get('home_details_3',[Controller::class,'getHomeSchreen_3']);
 
-// Route::get('create_order',[OrderController::class,'createOrder']);
 Route::get('orders',[OrderController::class,'getOrders']);
 Route::get('order_detail',[OrderController::class,'getOrderDetail']);
 Route::post('create_order',[OrderController::class,'createOrder']);

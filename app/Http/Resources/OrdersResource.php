@@ -28,7 +28,7 @@ class OrdersResource extends JsonResource
             'billing' => $this['billing'],
             'shipping' => $this['shipping'],
             'payment_method' => $this['payment_method'],
-            'line_items' => $this['line_items'],
+            'line_items' => OrderItemResource::collection($this['line_items']),
         ];
     }
 }

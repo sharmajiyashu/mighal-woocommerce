@@ -71,7 +71,8 @@ class OrderController extends Controller
                         ]);
                     }
                     $tokenData = $response->json();
-                    return $this->sendSuccess('Order create successfully',$tokenData);
+                    $data = new OrdersResource($tokenData);
+                    return $this->sendSuccess('Order create successfully',$data);
                 } else {
                     return $this->sendFailed('Order create failour',);
                 }

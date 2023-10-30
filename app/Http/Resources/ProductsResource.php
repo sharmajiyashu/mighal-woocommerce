@@ -30,7 +30,7 @@ class ProductsResource extends JsonResource
             'regular_price' => $this['regular_price'],
             'price' => $this['price'],
             // 'categories' => $this['categories'],
-            'images' => $image,
+            'images' => ImagesResource::collection($this['images']),
             'attributes' => $this['attributes'],
             'default_attributes' => $this['default_attributes'],
             'variations' => $this['variations'],
