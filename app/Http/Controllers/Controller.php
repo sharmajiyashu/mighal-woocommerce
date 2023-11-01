@@ -146,7 +146,7 @@ class Controller extends BaseController
         if ($response->successful()) {
             $tokenData = $response->json();
             $data = ProductsResource::collection($tokenData);
-            return $this->sendSuccess('Product fetch successfully',$data);
+            return $this->sendSuccess('Product fetch successfully',['category_id' => $category_id ,'items' => $data]);
         } else {
             return $this->sendFailed('Login failed',);
         }
