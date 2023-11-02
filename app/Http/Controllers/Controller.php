@@ -6,7 +6,9 @@ use App\Http\Requests\ApiLoginRequest;
 use App\Http\Requests\ApiRegisterRequest;
 use App\Http\Requests\ApiTokenRequest;
 use App\Http\Resources\CategoriesResource;
+use App\Http\Resources\CountriesResource;
 use App\Http\Resources\ProductsResource;
+use App\Http\Resources\StateResource;
 use App\Traits\ApiResponse;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -250,6 +252,43 @@ class Controller extends BaseController
     //         return $this->sendFailed('Login failed',);
     //     }
     // }
+
+
+    function getCountries(){
+        $woocommerceUrl = env('woocommerce_url');
+        $consumerKey = env('consumer_key');
+        $consumerSecret = env('consumer_secret');
+        $credentials = base64_encode("$consumerKey:$consumerSecret");
+        $response = Http::withHeaders([
+            'Authorization' => 'Basic ' . $credentials,
+        ])->get("$woocommerceUrl/wp-json/wc/v3/data/countries");   
+
+        // return $response;
+        if ($response->successful()) {
+            $data = CountriesResource::collection($response->json());
+            return $this->sendSuccess('Countries fetch successfully',$data);
+        } else {
+            return $this->sendFailed('Login failed',);
+        }
+    }
+
+    function getState(Request $request){
+        $woocommerceUrl = env('woocommerce_url');
+        $consumerKey = env('consumer_key');
+        $consumerSecret = env('consumer_secret');
+        $credentials = base64_encode("$consumerKey:$consumerSecret");
+        $response = Http::withHeaders([
+            'Authorization' => 'Basic ' . $credentials,
+        ])->get("$woocommerceUrl/wp-json/wc/v3/data/continents/$request->country_code");   
+        if ($response->successful()) {
+            $data = new StateResource($response->json());
+            return $this->sendSuccess('Countries fetch successfully',$data);
+        } else {
+            return $this->sendFailed('Login failed',);
+        }
+    }
+
+
 }
 
 
