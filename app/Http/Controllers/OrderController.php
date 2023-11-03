@@ -97,7 +97,7 @@ class OrderController extends Controller
             // 'Authorization' => 'Bearer ' . $token,
             'Authorization' => 'Basic ' . $credentials,
         ])->get("$woocommerceUrl/wp-json/wc/v3/orders?customer=7219");
-        // return $response;
+        return $response;
         $data = $response->json();
         $collect = OrdersResource::collection($data);
         return $this->sendSuccess('Orders fetch successfully',$collect);

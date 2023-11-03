@@ -44,5 +44,6 @@ Route::get('get_user_cart',[CartController::class,'getUserCartDetails']);
 Route::post('remove_cart_item',[CartController::class,'removeCartItem']);
 Route::get('countaries',[Controller::class,'getCountries']);
 Route::get('get_state',[Controller::class,'getState']);
+Route::post('apply_coupon',[CartController::class,'applyCoupon']);
 
 Route::post('update_shipping_address',[CartController::class,'updateShippingAddress']);

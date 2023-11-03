@@ -18,7 +18,8 @@ class CartController extends Controller
         $woocommerceUrl = env('woocommerce_url');
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $request->token, // Replace with your JWT token
-        ])->get("$woocommerceUrl/wp-json/wc/store/cart/");        
+        ])->get("$woocommerceUrl/wp-json/wc/store/cart/"); 
+        return $response;       
         if ($response->successful()) {
             $cartDetails = $response->json();
             $data = new CartResource($cartDetails);
@@ -169,6 +170,26 @@ class CartController extends Controller
             'total_added' => $success_added,
             'error' => $error_msg
         ]);
+    }
+
+
+    function applyCoupon(Request $request){
+        $woocommerceUrl = env('woocommerce_url');
+        $consumerKey = env('consumer_key');
+        $consumerSecret = env('consumer_secret');
+        $credentials = base64_encode("$consumerKey:$consumerSecret");
+        $customerID = 7219;
+        $cartKey = "4b56f7c0493648c3c0870c4e3edabd3a";
+        $couponCode = "tpaav_p5rxv_ge";
+        $token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL21pZ2h6YWxhbGFyYWIuY29tIiwiaWF0IjoxNjk4OTg4NjQyLCJuYmYiOjE2OTg5ODg2NDIsImV4cCI6MTY5OTU5MzQ0MiwiZGF0YSI6eyJ1c2VyIjp7ImlkIjoiNzIxOSJ9fX0.Kr0NEP0tP2WPiTmom2vvQDUro_0DjVlc96eHkGXf6GM";
+        $response = Http::withHeaders([
+            'Authorization' => 'Basic ' . $credentials,
+            // 'Authorization' => 'Bearer ' . $token,
+        ])->post("$woocommerceUrl/wp-json/carts/{$cartKey}/apply_coupon",[
+            'code' => $couponCode,
+            'username' => "yashu@gmail.com"
+        ]);
+        return $response;
     }
 
 }

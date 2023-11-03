@@ -14,11 +14,18 @@ class CartResource extends JsonResource
      */
     public function toArray($request)
     {
+        $totals = $this['totals'];
+        if(isset($totals['total_items'])){
+            $totals['total_items'] = $totals['total_items'] / 100;
+        }
+        if(isset($totals['total_price'])){
+            $totals['total_price'] = $totals['total_price'] / 100;
+        }
         return [
             'items' =>  CartItemsResource::collection($this['items']),
             'coupons' => $this['coupons'],
             'fees' => $this['fees'],
-            'totals' => $this['totals'],
+            'totals' => $totals,
             'shipping_address' => $this['shipping_address'],
             'billing_address' => $this['billing_address'],
             'needs_payment' => $this['needs_payment'],
