@@ -289,6 +289,30 @@ class Controller extends BaseController
         }
     }
 
+    public function related_products_id(Request $request)
+    {
+        $productIds = $request->all();
+        $productIdsQueryParam = implode(',', $productIds);
+        $woocommerceUrl = env('woocommerce_url');
+        $consumerKey = env('consumer_key');
+        $consumerSecret = env('consumer_secret');
+        $credentials = base64_encode("$consumerKey:$consumerSecret");
+        $response = Http::withHeaders([
+            'Authorization' => 'Basic ' . $credentials,
+        ])->get("$woocommerceUrl/wp-json/wc/v3/products",[
+            'per_page' => 100,
+            'page' => 1,
+            'include' => $productIdsQueryParam,
+        ]);
+        if ($response->successful()) {
+            $tokenData = $response->json();
+            $data = ProductsResource::collection($tokenData);
+            return $this->sendSuccess('Product fetch successfully',$data);
+        } else {
+            return $this->sendFailed('Login failed',);
+        }
+    }
+
 
 }
 
