@@ -20,6 +20,25 @@ class ProductsResource extends JsonResource
                 $image[] = $val['src'];
             }
         }
+
+        $variations = $this['variations'];
+        $i = 0;
+        $options = [];
+        if(is_array($this['attributes'])){
+            foreach($this['attributes'] as $key=>$val){
+                if(is_array($val['options'])){
+                    $option = [];
+                    foreach($val['options'] as $k => $v){
+                        $varient_id = isset($variations[$i]) ? $variations[$i] :$this['id'];
+                        $i ++;
+                        $option[] =  ['product_id' => $varient_id ,'value' => $v];
+                    }
+                    $val['options'] = $option;
+                    $options[] = $val;
+                }
+            }
+        }
+
         return [
             'product_id' => $this['id'],
             'product_name' => $this['name'],
@@ -31,7 +50,8 @@ class ProductsResource extends JsonResource
             'price' => $this['price'],
             // 'categories' => $this['categories'],
             'images' => ImagesResource::collection($this['images']),
-            'attributes' => $this['attributes'],
+            'attributes' => $options,
+            // 'attributes_old' => $this['attributes'],
             'default_attributes' => $this['default_attributes'],
             'variations' => $this['variations'],
             'price_html' => $this['price_html'],

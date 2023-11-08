@@ -141,7 +141,8 @@ class Controller extends BaseController
         $credentials = base64_encode("$consumerKey:$consumerSecret");
         $response = Http::withHeaders([
             'Authorization' => 'Basic ' . $credentials,
-        ])->get("$woocommerceUrl/wp-json/wc/v3/products?category=$category_id",[
+        ])->get("$woocommerceUrl/wp-json/wc/v3/products",[
+            'category' => $category_id,
             'per_page' => 100,
             'page' => 1,
         ]);
