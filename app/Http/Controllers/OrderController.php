@@ -19,6 +19,7 @@ class OrderController extends Controller
 
     function createOrder(Request $request){
         $coupon_code = $request->coupon_code;
+        $payment_method = $request->payment_method;
         $woocommerceUrl = env('woocommerce_url');
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $request->token, // Replace with your JWT token
@@ -41,7 +42,7 @@ class OrderController extends Controller
                     'billing' => $cartDetails['shipping_address'],
                     'shipping' => $cartDetails['billing_address'],
                     'line_items' => $cart_items,
-                    'payment_method' => 'cod',
+                    'payment_method' => $payment_method,
                     'customer_id' => $request->customer_id, // Replace with the actual customer's ID
                     'shipping_lines' => [
                         [
@@ -103,7 +104,6 @@ class OrderController extends Controller
             // 'Authorization' => 'Bearer ' . $token,
             'Authorization' => 'Basic ' . $credentials,
         ])->get("$woocommerceUrl/wp-json/wc/v3/orders?customer=7219");
-        // return $response;
         $data = $response->json();
         $collect = OrdersResource::collection($data);
         return $this->sendSuccess('Orders fetch successfully',$collect);

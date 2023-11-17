@@ -39,6 +39,10 @@ class ProductsResource extends JsonResource
             }
         }
 
+        if(empty($this['sale_price'])){
+            $this['sale_price'] = $this['price'];
+        }
+
         return [
             'product_id' => $this['id'],
             'product_name' => $this['name'],
