@@ -18,6 +18,7 @@ class OrderController extends Controller
     use ApiResponse;
 
     function createOrder(Request $request){
+        $coupon_code = $request->coupon_code;
         $woocommerceUrl = env('woocommerce_url');
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $request->token, // Replace with your JWT token
@@ -50,6 +51,10 @@ class OrderController extends Controller
                         ],
                     ],
                     'status' => 'pending',
+                    // 'coupon_lines' => $cartDetails['coupons'],
+                    'coupon_lines' => [
+                        ['code' => $coupon_code]
+                    ],
                 ];
                 $token = $request->token;
                 $woocommerceUrl = env('woocommerce_url');
@@ -74,7 +79,8 @@ class OrderController extends Controller
                     $data = new OrdersResource($tokenData);
                     return $this->sendSuccess('Order create successfully',$data);
                 } else {
-                    return $this->sendFailed('Order create failour',);
+                    $data = $response->json();
+                    return $this->sendFailed($data['message'],);
                 }
             }else{
                 return $this->sendFailed('Cart value is empty',);
@@ -97,7 +103,7 @@ class OrderController extends Controller
             // 'Authorization' => 'Bearer ' . $token,
             'Authorization' => 'Basic ' . $credentials,
         ])->get("$woocommerceUrl/wp-json/wc/v3/orders?customer=7219");
-        return $response;
+        // return $response;
         $data = $response->json();
         $collect = OrdersResource::collection($data);
         return $this->sendSuccess('Orders fetch successfully',$collect);

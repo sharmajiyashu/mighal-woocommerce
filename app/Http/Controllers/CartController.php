@@ -9,6 +9,7 @@ use App\Http\Resources\CartResource;
 use Illuminate\Http\Request;
 use App\Traits\ApiResponse;
 use Illuminate\Support\Facades\Http;
+use GuzzleHttp\Client;
 
 class CartController extends Controller
 {
@@ -123,7 +124,10 @@ class CartController extends Controller
         ];
         $updated_billing_address = [
             'billing' => $data,
-            'shipping' => $data
+            'shipping' => $data,
+            'coupon_lines' => [
+                'code' => 'manan100',
+            ]
         ];
         $response = Http::withHeaders([
             'Authorization' => 'Basic ' . $credentials,
@@ -182,50 +186,45 @@ class CartController extends Controller
     }
 
 
-    // function applyCoupon(Request $request){
-    //     $woocommerceUrl = env('woocommerce_url');
-    //     $consumerKey = env('consumer_key');
-    //     $consumerSecret = env('consumer_secret');
-    //     $credentials = base64_encode("$consumerKey:$consumerSecret");
-    //     $customerID = 7219;
-    //     $cartKey = "4b56f7c0493648c3c0870c4e3edabd3a";
-    //     $couponCode = "tpaav_p5rxv_ge";
-    //     $token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL21pZ2h6YWxhbGFyYWIuY29tIiwiaWF0IjoxNjk4OTg4NjQyLCJuYmYiOjE2OTg5ODg2NDIsImV4cCI6MTY5OTU5MzQ0MiwiZGF0YSI6eyJ1c2VyIjp7ImlkIjoiNzIxOSJ9fX0.Kr0NEP0tP2WPiTmom2vvQDUro_0DjVlc96eHkGXf6GM";
-    //     $response = Http::withHeaders([
-    //         'Authorization' => 'Basic ' . $credentials,
-    //         // 'Authorization' => 'Bearer ' . $token,
-    //     ])->post("$woocommerceUrl/wp-json/carts/{$cartKey}/apply_coupon",[
-    //         'code' => $couponCode,
-    //         'customer_id' => $customerID
-    //     ]);
-    //     return $response;
-    // }
-
-
     function applyCoupon(Request $request){
         $woocommerceUrl = env('woocommerce_url');
         $consumerKey = env('consumer_key');
         $consumerSecret = env('consumer_secret');
         $credentials = base64_encode("$consumerKey:$consumerSecret");
-        $customerID = 7219;
-        $cartKey = "4b56f7c0493648c3c0870c4e3edabd3a";
-        $couponCode = "tpaav_p5rxv_ge";
-        $token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL21pZ2h6YWxhbGFyYWIuY29tIiwiaWF0IjoxNjk4OTg4NjQyLCJuYmYiOjE2OTg5ODg2NDIsImV4cCI6MTY5OTU5MzQ0MiwiZGF0YSI6eyJ1c2VyIjp7ImlkIjoiNzIxOSJ9fX0.Kr0NEP0tP2WPiTmom2vvQDUro_0DjVlc96eHkGXf6GM";
+        $code = $request->code;
+        $response = Http::withHeaders([
+            'Authorization' => 'Basic ' . $credentials,
+        ])->get("$woocommerceUrl/wp-json/wc/v3/coupons",[
+            'per_page' => 100,
+            'page' => 1,
+            'search' => $code,
+            'status' => 'publish', // Use 'publish' to get active coupons
+        ]);
+        if ($response->successful()) {
+            $data = [];
+            $data_all = $response->json();
+            foreach($data_all as $key => $val){
+                if($val['code'] == $code){
+                    $data = $val;
+                }
+            }
+            if(!empty($data)){
+                return $this->sendSuccess('Coupon fetch successfully',$response->json());
+            }else{
+                return $this->sendFailed('invalid coupon code',);    
+            }
+            
+        } else {
+            $data = $response->json();
+            return $this->sendFailed($data['message'],);
+        }
 
-        // $response = Http::withHeaders([
-        //     'Authorization' => 'Basic ' . $credentials,
-        //     // 'Authorization' => 'Bearer ' . $token,
-        // ])->post("$woocommerceUrl/wp-json/carts/{$cartKey}/apply_coupon",[
-        //     'code' => $couponCode,
-        //     'customer_id' => $customerID
-        // ]);
-        // return $response;
+
+       
+        
 
 
-
-        // $updateResponse = Http::withHeaders([
-            // 'Authorization' => 'Bearer ' . $token, // Replace with your JWT token
-        // ])->put("$woocommerceUrl/wp-json/wc/store/cart/", $updatedCartData);
+        
     }
 
 
