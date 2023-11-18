@@ -47,3 +47,4 @@ Route::get('get_state',[Controller::class,'getState']);
 Route::post('apply_coupon',[CartController::class,'applyCoupon']);
 Route::post('get_related_product_ids',[Controller::class,'related_products_id']);
 Route::post('update_shipping_address',[CartController::class,'updateShippingAddress']);
+Route::get('search_products',[Controller::class,'searchProducts']);
