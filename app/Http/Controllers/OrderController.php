@@ -99,11 +99,13 @@ class OrderController extends Controller
         $consumerKey = env('consumer_key');
         $consumerSecret = env('consumer_secret');
         $credentials = base64_encode("$consumerKey:$consumerSecret");
-
         $response = Http::withHeaders([
             // 'Authorization' => 'Bearer ' . $token,
             'Authorization' => 'Basic ' . $credentials,
-        ])->get("$woocommerceUrl/wp-json/wc/v3/orders?customer=7219");
+        ])->get("$woocommerceUrl/wp-json/wc/v3/orders?customer=$customer_id",[
+            'per_page' => 100,
+            'page' => 1,
+        ]);
         $data = $response->json();
         $collect = OrdersResource::collection($data);
         return $this->sendSuccess('Orders fetch successfully',$collect);

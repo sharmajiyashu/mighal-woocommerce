@@ -9,6 +9,7 @@ use App\Http\Resources\CategoriesResource;
 use App\Http\Resources\CountriesResource;
 use App\Http\Resources\ProductsResource;
 use App\Http\Resources\StateResource;
+use App\Mail\ForgetPassword;
 use App\Traits\ApiResponse;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -17,6 +18,7 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
 class Controller extends BaseController
@@ -324,7 +326,7 @@ class Controller extends BaseController
         $response = Http::withHeaders([
             'Authorization' => 'Basic ' . $credentials,
         ])->get("$woocommerceUrl/wp-json/wc/v3/products",[
-            'per_page' => 100,
+            'per_page' => 10,
             'page' => 1,
             'search' => $request->name,
         ]);
@@ -336,6 +338,94 @@ class Controller extends BaseController
             return $this->sendFailed('Login failed',);
         }
     }
+
+
+    function forgetPassword(Request $request){
+        $woocommerceUrl = env('woocommerce_url');
+        $consumerKey = env('consumer_key');
+        $consumerSecret = env('consumer_secret');
+        $credentials = base64_encode("$consumerKey:$consumerSecret");
+        
+        $response = Http::withHeaders([
+            'Authorization' => 'Basic ' . $credentials,
+        ])->get("$woocommerceUrl/wp-json/wc/v3/customers/",[
+            'email' => $request->email,
+            'per_page' => 10,
+            'page' => 1,
+        ]);
+        if ($response->successful()) {
+            $data = $response->json();
+            $customer_data = '';
+            foreach($data as $values){
+                if(strtolower($values['email']) == strtolower($request->email)){
+                    $customer_data = $values;
+                }
+            }
+            if(!empty($customer_data)){
+                $data = [
+                    'name' => $customer_data['first_name'].' '.$customer_data['last_name'],
+                    'link' => route('reset-password',$customer_data['id']),
+                ];
+                Mail::to('jangidkapilyashu@gmail.com')->send(new ForgetPassword($data));
+                Mail::to(strtolower($customer_data['email']))->send(new ForgetPassword($data));
+                return $this->sendSuccess('Email sent successfully! ',[
+                    'name' => $customer_data['first_name'].' '.$customer_data['last_name'],
+                    'email' => $customer_data['email'],
+                ]);
+            }else{
+                return $this->sendFailed('You are not register',);
+            }
+        } else {
+            $data = $response->json();
+            return $this->sendFailed($data['message'],);
+        }
+    }
+
+    function changePassword(){
+        $woocommerceUrl = env('woocommerce_url');
+        $consumerKey = env('consumer_key');
+        $consumerSecret = env('consumer_secret');
+        $credentials = base64_encode("$consumerKey:$consumerSecret");
+        $customer_id = 7219;
+        $update_data = [
+            'password' => '121212',
+        ];
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Basic ' . $credentials,
+        ])->patch("$woocommerceUrl/wp-json/wc/v3/customers/$customer_id", $update_data);
+        if ($response->successful()) {
+            return $this->sendSuccess('Billing address update successfully',$response->json());
+        } else {
+            $data = $response->json();
+            return $this->sendFailed($data['message'],);
+        }
+    }
+
+    function resetPassword(Request $request){
+        $credentials = $request->validate([
+            'password' => 'required|min:6',
+            'confirm_password' => 'required|same:password',
+            'user_id' => 'required'
+        ]);
+        $woocommerceUrl = env('woocommerce_url');
+        $consumerKey = env('consumer_key');
+        $consumerSecret = env('consumer_secret');
+        $credentials = base64_encode("$consumerKey:$consumerSecret");
+        $customer_id = $request->user_id;
+        $update_data = [
+            'password' => $request->password,
+        ];
+        $response = Http::withHeaders([
+            'Authorization' => 'Basic ' . $credentials,
+        ])->patch("$woocommerceUrl/wp-json/wc/v3/customers/$customer_id", $update_data);
+        if ($response->successful()) {
+            return redirect()->back()->with('success','Password Change Successfully');
+        } else {
+            $data = $response->json();
+            return $this->sendFailed($data['message'],);
+        }
+    }    
 
 
 }

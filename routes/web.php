@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,5 +15,11 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('forget-password');
 });
+
+Route::get('reset-password/{id}',function($id){
+    return view('reset-password',compact('id'));
+})->name('reset-password');
+
+Route::post('reset_password',[Controller::class,'resetPassword'])->name('reset_password');

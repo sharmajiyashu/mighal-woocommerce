@@ -40,6 +40,8 @@ class OrdersResource extends JsonResource
             'quantity' => $quantity,
             'line_items' => OrderItemResource::collection($this['line_items']),
             'payment_url' => isset($this['payment_url']) ? $this['payment_url'] :'',
+            'payment_method_title' => $this['payment_method_title'],
+            'order_number' => $this['number'],
         ];
     }
 }

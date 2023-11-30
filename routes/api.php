@@ -48,3 +48,6 @@ Route::post('apply_coupon',[CartController::class,'applyCoupon']);
 Route::post('get_related_product_ids',[Controller::class,'related_products_id']);
 Route::post('update_shipping_address',[CartController::class,'updateShippingAddress']);
 Route::get('search_products',[Controller::class,'searchProducts']);
+
+// Route::get('change_password',[Controller::class,'changePassword']);
+Route::get('forget_password',[Controller::class,'forgetPassword']);
