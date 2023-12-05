@@ -42,6 +42,61 @@ class Controller extends BaseController
     }
 
 
+    public function customerDetail(Request $request)
+    {
+        $woocommerceUrl = env('woocommerce_url');
+        $consumerKey = env('consumer_key');
+        $consumerSecret = env('consumer_secret');
+        $credentials = base64_encode("$consumerKey:$consumerSecret");
+        $customerId = $request->customer_id; // Replace with the actual customer ID you want to retrieve
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Basic ' . $credentials,
+        ])->get("$woocommerceUrl/wp-json/wc/v3/customers/$customerId");
+        if ($response->successful()) {
+            $user = $response->json();
+            return $this->sendSuccess('Customer data fetch successfully',$user);
+        } else {
+            $data = $response->json();
+            return $this->sendFailed($data['message'],);
+        }
+    }
+
+    function updateCustomerID(Request $request){
+        $woocommerceUrl = env('woocommerce_url');
+        $consumerKey = env('consumer_key');
+        $consumerSecret = env('consumer_secret');
+        $credentials = base64_encode("$consumerKey:$consumerSecret");
+        $customerId = $request->customer_id; // Replace with the actual customer ID you want to retrieve
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Basic ' . $credentials,
+        ])->get("$woocommerceUrl/wp-json/wc/v3/customers/$customerId");
+        if ($response->successful()) {
+            $customerData = $response->json();
+            // Add or update the meta key and value
+            $customerData['meta_data'][] = [
+                'key' => 'payment_customer_id',
+                'value' => "$request->payment_customer_id",
+            ];
+            // Now, update the customer with the new meta data
+            $updateResponse = Http::withHeaders([
+                'Authorization' => 'Basic ' . $credentials,
+            ])->put("$woocommerceUrl/wp-json/wc/v3/customers/$customerId", $customerData);
+        
+            if ($updateResponse->successful()) {
+                return $this->sendSuccess('Meta data added successfully', $updateResponse->json());
+            } else {
+                $data = $updateResponse->json();
+                return $this->sendFailed($data['message']);
+            }
+        } else {
+            $data = $response->json();
+            return $this->sendFailed($data['message']);
+        }
+    }
+
+
     public function loginUser(ApiLoginRequest $request)
     {
         $woocommerceUrl = env('woocommerce_url');

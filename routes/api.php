@@ -25,6 +25,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('register_user',[Controller::class,'registerUser']);
 Route::post('login',[Controller::class,'loginUser']);
 Route::get('user_detail',[Controller::class,'getUserDetails']);
+Route::get('customer_detail',[Controller::class,'customerDetail']);
 Route::get('categories',[Controller::class,'getCategories']);
 Route::get('products',[Controller::class,'getProducts']);
 Route::get('category_products',[Controller::class,'getCategoryProducts']);
@@ -51,3 +52,5 @@ Route::get('search_products',[Controller::class,'searchProducts']);
 
 // Route::get('change_password',[Controller::class,'changePassword']);
 Route::get('forget_password',[Controller::class,'forgetPassword']);
+
+Route::post('update_customer_id',[Controller::class,'updateCustomerID']);

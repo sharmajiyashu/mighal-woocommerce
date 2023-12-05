@@ -52,11 +52,19 @@ class OrderController extends Controller
                         ],
                     ],
                     'status' => 'pending',
+                    // 'status' => 'completed',
                     // 'coupon_lines' => $cartDetails['coupons'],
-                    'coupon_lines' => [
-                        ['code' => $coupon_code]
-                    ],
+                    // 'coupon_lines' => [
+                    //     ['code' => $coupon_code]
+                    // ],
                 ];
+                if(!empty($coupon_code)){
+                    $order_data['coupon_lines'] = [
+                        ['code' => $coupon_code]
+                    ];
+                }
+
+
                 $token = $request->token;
                 $woocommerceUrl = env('woocommerce_url');
                 $consumerKey = env('consumer_key');
@@ -102,7 +110,8 @@ class OrderController extends Controller
         $response = Http::withHeaders([
             // 'Authorization' => 'Bearer ' . $token,
             'Authorization' => 'Basic ' . $credentials,
-        ])->get("$woocommerceUrl/wp-json/wc/v3/orders?customer=$customer_id",[
+        ])->get("$woocommerceUrl/wp-json/wc/v3/orders/",[
+            'customer' => $customer_id,
             'per_page' => 100,
             'page' => 1,
         ]);
