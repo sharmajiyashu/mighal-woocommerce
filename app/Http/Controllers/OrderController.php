@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ApiCustomerIDRequest;
 use App\Http\Requests\ApiTokenRequest;
+use App\Http\Requests\CreateOrder;
 use App\Http\Resources\CartResource;
 use App\Http\Resources\OrdersResource;
 use App\Traits\ApiResponse;
@@ -17,7 +18,7 @@ class OrderController extends Controller
 
     use ApiResponse;
 
-    function createOrder(Request $request){
+    function createOrder(CreateOrder $request){
         $coupon_code = $request->coupon_code;
         $payment_method = $request->payment_method;
         $woocommerceUrl = env('woocommerce_url');
@@ -51,12 +52,7 @@ class OrderController extends Controller
                             'total' => '00.00',
                         ],
                     ],
-                    'status' => 'pending',
-                    // 'status' => 'completed',
-                    // 'coupon_lines' => $cartDetails['coupons'],
-                    // 'coupon_lines' => [
-                    //     ['code' => $coupon_code]
-                    // ],
+                    'status' => 'processing',
                 ];
                 if(!empty($coupon_code)){
                     $order_data['coupon_lines'] = [
@@ -64,6 +60,14 @@ class OrderController extends Controller
                     ];
                 }
 
+                $order_data['meta_data'][] = [
+                    'key' => 'order_from',
+                    'value' => "mobile",
+                ];
+
+                if(!empty($request->transaction_id)){
+                    $order_data['transaction_id'] =  $request->transaction_id;
+                }
 
                 $token = $request->token;
                 $woocommerceUrl = env('woocommerce_url');

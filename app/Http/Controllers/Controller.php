@@ -54,7 +54,16 @@ class Controller extends BaseController
             'Authorization' => 'Basic ' . $credentials,
         ])->get("$woocommerceUrl/wp-json/wc/v3/customers/$customerId");
         if ($response->successful()) {
+
             $user = $response->json();
+            $payment_customer_id = '';
+            foreach($user['meta_data'] as $key=>$val){
+                if($val['key'] == 'payment_customer_id'){
+                    $payment_customer_id = $val['value'];
+                }
+                
+            }
+            $user['payment_customer_id'] = $payment_customer_id;
             return $this->sendSuccess('Customer data fetch successfully',$user);
         } else {
             $data = $response->json();
@@ -85,7 +94,15 @@ class Controller extends BaseController
             ])->put("$woocommerceUrl/wp-json/wc/v3/customers/$customerId", $customerData);
         
             if ($updateResponse->successful()) {
-                return $this->sendSuccess('Meta data added successfully', $updateResponse->json());
+                $user = $updateResponse->json();
+                $payment_customer_id = '';
+                foreach($user['meta_data'] as $key=>$val){
+                    if($val['key'] == 'payment_customer_id'){
+                        $payment_customer_id = $val['value'];
+                    }
+                }
+                $user['payment_customer_id'] = $payment_customer_id;
+                return $this->sendSuccess('Meta data added successfully', $user);
             } else {
                 $data = $updateResponse->json();
                 return $this->sendFailed($data['message']);
