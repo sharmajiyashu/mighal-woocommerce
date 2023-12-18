@@ -123,12 +123,25 @@ class CartController extends Controller
             'phone' => isset($request->phone) ? $request->phone :'',
         ];
         $updated_billing_address = [
-            'billing' => $data,
-            'shipping' => $data,
-            'coupon_lines' => [
-                'code' => 'manan100',
-            ]
+            // 'billing' => $data,
+            // 'shipping' => $data,
+            // 'coupon_lines' => [
+            //     'code' => 'manan100',
+            // ]
         ];
+
+        if($request->type == 'shipping'){
+            $updated_billing_address['shipping'] = $data;
+
+        }elseif($request->type == 'billing'){
+            $updated_billing_address['billing'] = $data;
+
+        }else{
+            $updated_billing_address['shipping'] = $data;
+            $updated_billing_address['billing'] = $data;
+        }
+
+        // print_r($updated_billing_address);die;
         $response = Http::withHeaders([
             'Authorization' => 'Basic ' . $credentials,
         ])->put("$woocommerceUrl/wp-json/wc/v3/customers/$customer_id", $updated_billing_address);

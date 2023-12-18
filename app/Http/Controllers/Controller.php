@@ -196,6 +196,7 @@ class Controller extends BaseController
         ])->get("$woocommerceUrl/wp-json/wc/v3/products",[
             'per_page' => 100,
             'page' => 1,
+            'status' => 'publish',
         ]);
         if ($response->successful()) {
             $tokenData = $response->json();
@@ -219,6 +220,7 @@ class Controller extends BaseController
             'category' => $category_id,
             'per_page' => 100,
             'page' => 1,
+            'status' => 'publish',
         ]);
         if ($response->successful()) {
             $tokenData = $response->json();
@@ -374,9 +376,10 @@ class Controller extends BaseController
         $response = Http::withHeaders([
             'Authorization' => 'Basic ' . $credentials,
         ])->get("$woocommerceUrl/wp-json/wc/v3/products",[
-            'per_page' => 100,
+            'per_page' => 4,
             'page' => 1,
             'include' => $productIdsQueryParam,
+            'status' => 'publish',
         ]);
         if ($response->successful()) {
             $tokenData = $response->json();
@@ -401,6 +404,7 @@ class Controller extends BaseController
             'per_page' => 10,
             'page' => 1,
             'search' => $request->name,
+            'status' => 'publish',
         ]);
         if ($response->successful()) {
             $tokenData = $response->json();

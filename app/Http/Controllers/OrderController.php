@@ -54,6 +54,15 @@ class OrderController extends Controller
                     ],
                     'status' => 'processing',
                 ];
+
+                if($request->billing_as_shipping == 'yes'){
+                    $order_data['billing'] = $cartDetails['shipping_address'];
+                }
+                
+                if($request->shipping_as_billing == 'yes'){
+                    $order_data['shipping'] = $cartDetails['billing'];   
+                }
+
                 if(!empty($coupon_code)){
                     $order_data['coupon_lines'] = [
                         ['code' => $coupon_code]
